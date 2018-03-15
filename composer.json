@@ -1,0 +1,37 @@
+{
+  "name": "silverstripe-terraformers/gridfield-rich-filter-header",
+  "description": "Rich filter header component from GridField",
+  "type": "silverstripe-vendormodule",
+  "keywords": [
+    "silverstripe", "gridfield", "filter", "header"
+  ],
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "SilverStripe Ltd"
+    },
+    {
+      "name": "Silverstripe Terraformers",
+      "email": "terraformers@silverstripe.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/silverstripe-terraformers/gridfield-rich-filter-header/issues"
+  },
+  "require": {
+    "silverstripe/vendor-plugin": "^1.0",
+    "silverstripe/framework": "^4@dev",
+    "silverstripe/cms": "^4@dev"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Terraformers\\RichFilterHeader\\": "src/",
+      "Terraformers\\RichFilterHeader\\Tests\\": "tests/"
+    }
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev"
+}
