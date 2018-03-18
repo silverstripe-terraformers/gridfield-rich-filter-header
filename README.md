@@ -30,6 +30,10 @@ Overall this module allows you to fully customise your `GridField` filters inclu
 * the last column of the table needs to have a vacant header cell so the filter widget could be displayed there
 * for example you can't have the last column with sorting header widget and filter widget at the same time
 
+## Installation
+
+`composer require silverstripe-terraformers/gridfield-rich-filter-header dev-master`
+
 ## Basic configuration
 
 Full filter configuration format looks like this:
@@ -193,7 +197,7 @@ $gridFieldConfig->removeComponentsByType(GridFieldFilterHeader::class);
 $filter = new RichFilterHeader();
 $filter
     ->setFilterConfig([
-        'Label' => 'TaxonomyTerms'
+        'Label' => 'TaxonomyTerms',
     ])
     ->setFilterFields([
         'TaxonomyTerms' => DropdownField::create(
@@ -223,7 +227,7 @@ $gridFieldConfig->removeComponentsByType(GridFieldFilterHeader::class);
 $filter = new RichFilterHeader();
 $filter
     ->setFilterConfig([
-       'Label'
+       'Label',
     ])
     ->setFilterMethods([
         'Label' => function (DataList $list, $name, $value) {
