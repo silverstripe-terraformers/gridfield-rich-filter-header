@@ -482,6 +482,36 @@ class RichFilterHeader extends GridFieldFilterHeader
     }
 
     /**
+     * Returns whether this {@link GridField} has any columns to sort on at all.
+     *
+     * @param GridField $gridField
+     * @return boolean
+     */
+    public function canFilterAnyColumns($gridField)
+    {
+        $list = $gridField->getList();
+
+        if (!$this->checkDataType($list)) {
+            return false;
+        }
+
+        $columns = $gridField->getColumns();
+        foreach ($columns as $name) {
+            $metadata = $gridField->getColumnMetadata($name);
+            $title = $metadata['title'];
+
+            $fieldConfig = $this->findFieldConfig($name);
+            $name = (!empty($fieldConfig['title'])) ? $fieldConfig['title'] : $name;
+
+            if ($title && !empty($fieldConfig) && ($list->canFilterBy($name) || $this->hasFilterMethod($name))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param GridField $gridField
      * @param SS_List $dataList
      * @return SS_List
