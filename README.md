@@ -217,7 +217,7 @@ $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 
 ### Example #3
 
-* filter with `TextField` and custom filter method
+* filter with `TextField` (with custom placeholder text) and custom filter method
 
 Our custom filter method filters records by three different `DB` columns via `PartialMatch` filter.
 
@@ -227,7 +227,10 @@ $gridFieldConfig->removeComponentsByType(GridFieldFilterHeader::class);
 $filter = new RichFilterHeader();
 $filter
     ->setFilterConfig([
-       'Label',
+        'Label',
+    ])
+    ->setFilterFields([
+        'Label' => $label = TextField::create('', ''),
     ])
     ->setFilterMethods([
         'Label' => function (DataList $list, $name, $value) {
@@ -238,6 +241,7 @@ $filter
             ]);
         },
     ]);
-    
+
+$label->setAttribute('placeholder', 'Filter by three different columns');
 $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 ```
