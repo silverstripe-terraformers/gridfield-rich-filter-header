@@ -1,6 +1,7 @@
 {
   "name": "silverstripe-terraformers/gridfield-rich-filter-header",
   "description": "Rich filter header component from GridField",
+  "type": "silverstripe-module",
   "keywords": [
     "silverstripe", "gridfield", "filter", "header"
   ],
