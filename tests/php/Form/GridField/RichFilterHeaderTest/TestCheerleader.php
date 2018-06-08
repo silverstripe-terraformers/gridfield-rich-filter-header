@@ -18,7 +18,7 @@ class TestCheerleader extends DataObject implements TestOnly
      * @var array
      */
     private static $has_one = [
-        'Team' => 'Team'
+        'Team' => 'TestTeam'
     ];
 
     /**

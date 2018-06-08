@@ -20,7 +20,7 @@ class RichFilterHeaderTest extends SapphireTest
      * @var string
      */
     protected static $fixture_file = 'RichFilterHeaderTest.yml';
-
+    protected $usesDatabase = true;
     /**
      * @var array
      */
@@ -42,7 +42,7 @@ class RichFilterHeaderTest extends SapphireTest
 
         $this->gridField = new GridField('testfield', 'testfield', $list, $config);
         $this->form = new Form(
-            null,
+            Controller::curr(),
             'mockform',
             new FieldList([$this->gridField]),
             new FieldList()
@@ -72,7 +72,7 @@ class RichFilterHeaderTest extends SapphireTest
 
         $this->assertContains(
             '<input type="text" name="filter[testfield][City]"'
-            . ' class="text grid-field__sort-field no-change-track form-group--no-label"'
+            . ' class="text grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City" />',
             $htmlFragment['header']
         );
@@ -94,14 +94,14 @@ class RichFilterHeaderTest extends SapphireTest
 
         $this->assertContains(
             '<select name="filter[testfield][Name]" '
-            . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
+            . 'class="dropdown grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_Name" placeholder="Filter by Name">',
             $htmlFragment['header']
         );
 
         $this->assertContains(
             '<select name="filter[testfield][City]" '
-            . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
+            . 'class="dropdown grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City">',
             $htmlFragment['header']
         );
@@ -134,14 +134,14 @@ class RichFilterHeaderTest extends SapphireTest
 
         $this->assertContains(
             '<select name="filter[testfield][Name]" '
-            . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
+            . 'class="dropdown grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_Name" placeholder="Filter by Name">',
             $htmlFragment['header']
         );
 
         $this->assertContains(
             '<select name="filter[testfield][City]" '
-            . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
+            . 'class="dropdown grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City">',
             $htmlFragment['header']
         );
@@ -151,6 +151,7 @@ class RichFilterHeaderTest extends SapphireTest
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
+        $controller = Controller::curr();
 
         /** @var $component RichFilterHeader */
         $component = $config->getComponentByType('RichFilterHeader');
@@ -164,7 +165,7 @@ class RichFilterHeaderTest extends SapphireTest
         $city = 'Auckland';
 
         $stateID = 'testGridStateActionField';
-        $session = Controller::curr()->getRequest()->getSession();
+        $session = $controller->getSession();
         $session->set(
             $stateID,
             [
@@ -190,7 +191,8 @@ class RichFilterHeaderTest extends SapphireTest
             ]
         );
 
-        $request->setSession($session);
+        $controller->setSession($session);
+        $controller->setRequest($request);
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
@@ -202,6 +204,7 @@ class RichFilterHeaderTest extends SapphireTest
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
+        $controller = Controller::curr();
 
         /** @var $component RichFilterHeader */
         $component = $config->getComponentByType('RichFilterHeader');
@@ -216,7 +219,7 @@ class RichFilterHeaderTest extends SapphireTest
         $keywords = 'Team 1';
 
         $stateID = 'testGridStateActionField';
-        $session = Controller::curr()->getRequest()->getSession();
+        $session = $controller->getSession();
         $session->set(
             $stateID,
             [
@@ -242,7 +245,8 @@ class RichFilterHeaderTest extends SapphireTest
             ]
         );
 
-        $request->setSession($session);
+        $controller->setSession($session);
+        $controller->setRequest($request);
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
@@ -255,6 +259,7 @@ class RichFilterHeaderTest extends SapphireTest
         $gridField = $this->gridField;
         $gridField->setList(DataList::create('TestCheerleader'));
         $config = $gridField->getConfig();
+        $controller = Controller::curr();
 
         /** @var $component RichFilterHeader */
         $component = $config->getComponentByType('RichFilterHeader');
@@ -271,7 +276,7 @@ class RichFilterHeaderTest extends SapphireTest
             ->first();
 
         $stateID = 'testGridStateActionField';
-        $session = Controller::curr()->getRequest()->getSession();
+        $session = $controller->getSession();
         $session->set(
             $stateID,
             [
@@ -297,7 +302,8 @@ class RichFilterHeaderTest extends SapphireTest
             ]
         );
 
-        $request->setSession($session);
+        $controller->setSession($session);
+        $controller->setRequest($request);
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
@@ -309,6 +315,7 @@ class RichFilterHeaderTest extends SapphireTest
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
+        $controller = Controller::curr();
 
         /** @var $component RichFilterHeader */
         $component = $config->getComponentByType('RichFilterHeader');
@@ -326,7 +333,7 @@ class RichFilterHeaderTest extends SapphireTest
             ]);
 
         $stateID = 'testGridStateActionField';
-        $session = Controller::curr()->getRequest()->getSession();
+        $session = $controller->getSession();
         $session->set(
             $stateID,
             [
@@ -352,7 +359,8 @@ class RichFilterHeaderTest extends SapphireTest
             ]
         );
 
-        $request->setSession($session);
+        $controller->setSession($session);
+        $controller->setRequest($request);
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
 
         /** @var DataList $list */
