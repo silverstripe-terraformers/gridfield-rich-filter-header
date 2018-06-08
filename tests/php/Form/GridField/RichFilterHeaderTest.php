@@ -24,7 +24,7 @@ class RichFilterHeaderTest extends SapphireTest
     /**
      * @var array
      */
-    protected static $extra_dataobjects = array(
+    protected $extraDataObjects = array(
         'TestTeam',
         'TestCheerleader',
         'TestCheerleaderHat',
@@ -37,8 +37,8 @@ class RichFilterHeaderTest extends SapphireTest
         $list = DataList::create('TestTeam');
 
         $config = new GridFieldConfig_RecordEditor();
-        $config->removeComponentsByType(GridFieldFilterHeader::class);
-        $config->addComponent(new RichFilterHeader(), GridFieldPaginator::class);
+        $config->removeComponentsByType('GridFieldFilterHeader');
+        $config->addComponent(new RichFilterHeader(), 'GridFieldPaginator');
 
         $this->gridField = new GridField('testfield', 'testfield', $list, $config);
         $this->form = new Form(
@@ -67,7 +67,7 @@ class RichFilterHeaderTest extends SapphireTest
         $config = $gridField->getConfig();
 
         /** @var $component RichFilterHeader */
-        $component = $config->getComponentByType(RichFilterHeader::class);
+        $component = $config->getComponentByType('RichFilterHeader');
         $htmlFragment = $component->getHTMLFragments($gridField);
 
         $this->assertContains(
@@ -84,7 +84,7 @@ class RichFilterHeaderTest extends SapphireTest
         $config = $gridField->getConfig();
 
         /** @var $component RichFilterHeader */
-        $component = $config->getComponentByType(RichFilterHeader::class);
+        $component = $config->getComponentByType('RichFilterHeader');
         $component->setFilterFields([
             'Name' => DropdownField::create('', '', ['Name1' => 'Name1', 'Name2' => 'Name2']),
             'City' => DropdownField::create('', '', ['City' => 'City1', 'City2' => 'City2']),
@@ -113,7 +113,7 @@ class RichFilterHeaderTest extends SapphireTest
         $config = $gridField->getConfig();
 
         /** @var $component RichFilterHeader */
-        $component = $config->getComponentByType(RichFilterHeader::class);
+        $component = $config->getComponentByType('RichFilterHeader');
         $component
             ->setFilterConfig([
                 'Name' => [
@@ -153,7 +153,7 @@ class RichFilterHeaderTest extends SapphireTest
         $config = $gridField->getConfig();
 
         /** @var $component RichFilterHeader */
-        $component = $config->getComponentByType(RichFilterHeader::class);
+        $component = $config->getComponentByType('RichFilterHeader');
         $component->setFilterConfig([
             'City.Initial' => [
                 'title' => 'City',
@@ -204,7 +204,7 @@ class RichFilterHeaderTest extends SapphireTest
         $config = $gridField->getConfig();
 
         /** @var $component RichFilterHeader */
-        $component = $config->getComponentByType(RichFilterHeader::class);
+        $component = $config->getComponentByType('RichFilterHeader');
         $component
             ->setFilterConfig([
                 'Name',
@@ -257,7 +257,7 @@ class RichFilterHeaderTest extends SapphireTest
         $config = $gridField->getConfig();
 
         /** @var $component RichFilterHeader */
-        $component = $config->getComponentByType(RichFilterHeader::class);
+        $component = $config->getComponentByType('RichFilterHeader');
         $component
             ->setFilterConfig([
                 'Name' => 'Hats',
@@ -311,7 +311,7 @@ class RichFilterHeaderTest extends SapphireTest
         $config = $gridField->getConfig();
 
         /** @var $component RichFilterHeader */
-        $component = $config->getComponentByType(RichFilterHeader::class);
+        $component = $config->getComponentByType('RichFilterHeader');
         $component
             ->setFilterConfig([
                 'City',
