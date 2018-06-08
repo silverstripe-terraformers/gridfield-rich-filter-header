@@ -327,11 +327,13 @@ class RichFilterHeader extends GridFieldFilterHeader
         $tableSeparator = '_';
 
         $className = $list->dataClass();
+        $relationClassName = singleton($className)->getRelationClass($relationName);
         $relationTableName = $className . $tableSeparator . $relationName;
-
-        return $list
+        $list = $list
             ->innerJoin($relationTableName, $className . '.ID=' . $relationTableName . '.' . $className . 'ID')
-            ->filter($relationTableName . 'ID', $value);
+            ->filter($relationClassName . 'ID', $value);
+
+        return $list;
     }
 
     /**
