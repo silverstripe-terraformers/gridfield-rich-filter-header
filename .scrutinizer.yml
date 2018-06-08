@@ -12,4 +12,4 @@ checks:
     duplication: true
 
 filter:
-  paths: [src/*, tests/*]
+  paths: [code/*, tests/*]

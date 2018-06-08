@@ -1,15 +1,5 @@
 <?php
 
-namespace Terraformers\RichFilterHeader\Extension;
-
-use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Core\Extension;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\FormRequestHandler;
-use SilverStripe\Forms\GridField\GridField;
-
 /**
  * Class GridFieldRichFilterHeaderRequestExtension
  *
@@ -17,8 +7,6 @@ use SilverStripe\Forms\GridField\GridField;
  * and are identified by a composite field name
  *
  * @package Terraformers\RichFilterHeader\Extension
- *
- * @property FormRequestHandler|$this $owner
  */
 class GridFieldRichFilterHeaderRequestExtension extends Extension
 {
@@ -40,7 +28,7 @@ class GridFieldRichFilterHeaderRequestExtension extends Extension
 
     /**
      * @param FieldList $fields
-     * @param string $fieldName
+     * @param string    $fieldName
      * @return null|FormField
      */
     protected function findField(FieldList $fields, $fieldName)
@@ -61,10 +49,10 @@ class GridFieldRichFilterHeaderRequestExtension extends Extension
     }
 
     /**
-     * @param HTTPRequest $request
+     * @param $request
      * @return FormField
      */
-    public function handleFieldComposite(HTTPRequest $request)
+    public function handleFieldComposite($request)
     {
         $owner = $this->owner;
 

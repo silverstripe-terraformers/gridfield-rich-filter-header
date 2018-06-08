@@ -1,29 +1,5 @@
 <?php
 
-namespace Terraformers\RichFilterHeader\Form\GridField;
-
-use SilverStripe\Core\ClassInfo;
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Injector\Injector;
-use SilverStripe\Forms\FieldGroup;
-use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridField_FormAction;
-use SilverStripe\Forms\GridField\GridFieldFilterHeader;
-use SilverStripe\Forms\GridField\GridState_Data;
-use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DataObjectSchema;
-use SilverStripe\ORM\Filterable;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\Filters\SearchFilter;
-use SilverStripe\ORM\SS_List;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\View\ArrayData;
-use SilverStripe\View\SSViewer;
-
 /**
  * Class RichFilterHeader
  *
@@ -147,8 +123,6 @@ use SilverStripe\View\SSViewer;
  */
 class RichFilterHeader extends GridFieldFilterHeader
 {
-    use Configurable;
-
     // predefined filter methods
     const FILTER_ALL_KEYWORDS = 'filter_all_keywords';
     const FILTER_MANY_MANY_RELATION = 'filter_many_many_relation';
@@ -240,7 +214,7 @@ class RichFilterHeader extends GridFieldFilterHeader
     }
 
     /**
-     * @param string $name
+     * @param string       $name
      * @param string|array $config
      * @return array
      */
@@ -299,8 +273,8 @@ class RichFilterHeader extends GridFieldFilterHeader
 
     /**
      * @param GridField $gridField
-     * @param string $name
-     * @param string $value
+     * @param string    $name
+     * @param string    $value
      * @return FormField
      */
     protected function createField(GridField $gridField, $name, $value)
@@ -323,39 +297,14 @@ class RichFilterHeader extends GridFieldFilterHeader
     }
 
     /**
-     * @param string $className
-     * @param string $relationName
-     * @return string
-     * @throws ValidationException
-     */
-    protected function findTableNameForRelation($className, $relationName)
-    {
-        $classes = ClassInfo::ancestry($className, true);
-        foreach ($classes as $class) {
-            $manyMany = Config::inst()->get($class, 'many_many', Config::UNINHERITED);
-            if (!empty($manyMany) && is_array($manyMany) && array_key_exists($relationName, $manyMany)) {
-                return DataObject::getSchema()->tableName($class);
-            }
-        }
-
-        throw new ValidationException(
-            sprintf(
-                'Specified relation %s not found in class %s or any of its ancestors',
-                $relationName,
-                $className
-            )
-        );
-    }
-
-    /**
      * Search for items that contain all keywords
      *
      * @param Filterable $list
-     * @param string $fieldName
-     * @param string $value
+     * @param string     $fieldName
+     * @param string     $value
      * @return Filterable
      */
-    protected function applyAllKeywordsFilter(Filterable $list, $fieldName, $value)
+    protected function applyAllKeywordsFilter($list, $fieldName, $value)
     {
         $keywords = preg_split('/[\s,]+/', $value);
         foreach ($keywords as $keyword) {
@@ -369,24 +318,22 @@ class RichFilterHeader extends GridFieldFilterHeader
      * Search for items via a many many relation
      *
      * @param DataList $list
-     * @param string $relationName
-     * @param string $value
+     * @param string   $relationName
+     * @param string   $value
      * @return DataList
      */
     protected function applyManyManyRelationFilter(DataList $list, $relationName, $value)
     {
-        $tableSeparator = DataObjectSchema::config()->uninherited('table_namespace_separator');
+        $tableSeparator = '_';
 
         $className = $list->dataClass();
-        $tableName = $this->findTableNameForRelation($className, $relationName);
-
-        $relationTable = $tableName . $tableSeparator . $relationName;
         $relationClassName = singleton($className)->getRelationClass($relationName);
-        $relationTableName = DataObject::getSchema()->tableName($relationClassName);
+        $relationTableName = $className . $tableSeparator . $relationName;
+        $list = $list
+            ->innerJoin($relationTableName, $className . '.ID=' . $relationTableName . '.' . $className . 'ID')
+            ->filter($relationClassName . 'ID', $value);
 
-        return $list
-            ->innerJoin($relationTable, $tableName . '.ID=' . $relationTable . '.' . $tableName . 'ID')
-            ->filter($relationTableName . 'ID', $value);
+        return $list;
     }
 
     /**
@@ -396,7 +343,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      */
     public static function createCompositeFieldName($gridFieldName, $childFieldName)
     {
-        $format = static::config()->get('field_name_encode');
+        $format = Config::inst()->get('RichFilterHeader', 'field_name_encode');
 
         return sprintf($format, $gridFieldName, $childFieldName);
     }
@@ -407,14 +354,14 @@ class RichFilterHeader extends GridFieldFilterHeader
      */
     public static function parseCompositeFieldName($name)
     {
-        $format = static::config()->get('field_name_decode');
+        $format = Config::inst()->get('RichFilterHeader', 'field_name_decode');
 
-        $matches= [];
+        $matches = [];
         preg_match($format, $name, $matches);
 
         if (isset($matches[1]) && $matches[2]) {
             return [
-                'grid_field' => $matches[1],
+                'grid_field'  => $matches[1],
                 'child_field' => $matches[2],
             ];
         }
@@ -513,7 +460,7 @@ class RichFilterHeader extends GridFieldFilterHeader
 
     /**
      * @param GridField $gridField
-     * @param SS_List $dataList
+     * @param SS_List   $dataList
      * @return SS_List
      */
     public function getManipulatedData(GridField $gridField, SS_List $dataList)
@@ -576,9 +523,9 @@ class RichFilterHeader extends GridFieldFilterHeader
 
     /**
      * @param GridField $gridField
-     * @param string $actionName
-     * @param mixed $arguments
-     * @param mixed $data
+     * @param string    $actionName
+     * @param mixed     $arguments
+     * @param mixed     $data
      */
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
@@ -672,7 +619,7 @@ class RichFilterHeader extends GridFieldFilterHeader
                     $field->setAttribute(
                         'placeholder',
                         _t('SilverStripe\\Forms\\GridField\\GridField.FilterBy', 'Filter by ')
-                        . _t('SilverStripe\\Forms\\GridField\\GridField.'.$metadata['title'], $metadata['title'])
+                        . _t('SilverStripe\\Forms\\GridField\\GridField.' . $metadata['title'], $metadata['title'])
                     );
                 }
 
@@ -724,7 +671,7 @@ class RichFilterHeader extends GridFieldFilterHeader
             return null;
         }
 
-        $templates = SSViewer::get_templates_by_class($this, '_Row', parent::class);
+        $templates = SSViewer::get_templates_by_class(self::class, '_Row', parent::class);
 
         return [
             'header' => $forTemplate->renderWith($templates),
