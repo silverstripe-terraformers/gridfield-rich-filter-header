@@ -1,24 +1,5 @@
 <?php
 
-namespace Terraformers\RichFilterHeader\Tests\Form\GridField;
-
-use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
-use Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Cheerleader;
-use Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\CheerleaderHat;
-use Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Team;
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Forms\DropdownField;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\Form;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
-use SilverStripe\Forms\GridField\GridFieldFilterHeader;
-use SilverStripe\Forms\GridField\GridFieldPaginator;
-use SilverStripe\ORM\DataList;
-use SilverStripe\Security\SecurityToken;
-
 /**
  * Class RichFilterHeaderTest
  * @package Terraformers\RichFilterHeader\Tests\Form\GridField
@@ -44,16 +25,16 @@ class RichFilterHeaderTest extends SapphireTest
      * @var array
      */
     protected static $extra_dataobjects = array(
-        Team::class,
-        Cheerleader::class,
-        CheerleaderHat::class,
+        'TestTeam',
+        'TestCheerleader',
+        'TestCheerleaderHat',
     );
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
-        $list = DataList::create(Team::class);
+        $list = DataList::create('TestTeam');
 
         $config = new GridFieldConfig_RecordEditor();
         $config->removeComponentsByType(GridFieldFilterHeader::class);
@@ -194,7 +175,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
 
         $token = SecurityToken::inst();
-        $request = new HTTPRequest(
+        $request = new SS_HTTPRequest(
             'POST',
             'url',
             [],
@@ -246,7 +227,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
 
         $token = SecurityToken::inst();
-        $request = new HTTPRequest(
+        $request = new SS_HTTPRequest(
             'POST',
             'url',
             [],
@@ -272,7 +253,7 @@ class RichFilterHeaderTest extends SapphireTest
     public function testRenderFilterHeaderAdvancedFilterManyManyRelation()
     {
         $gridField = $this->gridField;
-        $gridField->setList(DataList::create(Cheerleader::class));
+        $gridField->setList(DataList::create('TestCheerleader'));
         $config = $gridField->getConfig();
 
         /** @var $component RichFilterHeader */
@@ -285,7 +266,7 @@ class RichFilterHeaderTest extends SapphireTest
                 'Hats' => RichFilterHeader::FILTER_MANY_MANY_RELATION,
             ]);
 
-        $hat = CheerleaderHat::get()
+        $hat = TestCheerleaderHat::get()
             ->filter(['Colour' => 'Blue'])
             ->first();
 
@@ -301,7 +282,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
 
         $token = SecurityToken::inst();
-        $request = new HTTPRequest(
+        $request = new SS_HTTPRequest(
             'POST',
             'url',
             [],
@@ -356,7 +337,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
 
         $token = SecurityToken::inst();
-        $request = new HTTPRequest(
+        $request = new SS_HTTPRequest(
             'POST',
             'url',
             [],
