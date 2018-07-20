@@ -1,6 +1,6 @@
 ---
 Name: gridfield-rich-filter-header
 ---
-SilverStripe\Forms\FormRequestHandler:
+Form:
   extensions:
-    - Terraformers\RichFilterHeader\Extension\GridFieldRichFilterHeaderRequestExtension
+    - GridFieldRichFilterHeaderRequestExtension

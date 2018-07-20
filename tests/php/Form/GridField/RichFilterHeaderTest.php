@@ -1,27 +1,7 @@
 <?php
 
-namespace Terraformers\RichFilterHeader\Tests\Form\GridField;
-
-use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
-use Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Cheerleader;
-use Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\CheerleaderHat;
-use Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Team;
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Forms\DropdownField;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\Form;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
-use SilverStripe\Forms\GridField\GridFieldFilterHeader;
-use SilverStripe\Forms\GridField\GridFieldPaginator;
-use SilverStripe\ORM\DataList;
-use SilverStripe\Security\SecurityToken;
-
 /**
  * Class RichFilterHeaderTest
- * @package Terraformers\RichFilterHeader\Tests\Form\GridField
  */
 class RichFilterHeaderTest extends SapphireTest
 {
@@ -43,17 +23,17 @@ class RichFilterHeaderTest extends SapphireTest
     /**
      * @var array
      */
-    protected static $extra_dataobjects = array(
-        Team::class,
-        Cheerleader::class,
-        CheerleaderHat::class,
-    );
+    protected $extraDataObjects = [
+        TestTeam::class,
+        TestCheerleader::class,
+        TestCheerleaderHat::class,
+    ];
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
-        $list = DataList::create(Team::class);
+        $list = DataList::create(TestTeam::class);
 
         $config = new GridFieldConfig_RecordEditor();
         $config->removeComponentsByType(GridFieldFilterHeader::class);
@@ -61,7 +41,7 @@ class RichFilterHeaderTest extends SapphireTest
 
         $this->gridField = new GridField('testfield', 'testfield', $list, $config);
         $this->form = new Form(
-            null,
+            Controller::curr(),
             'mockform',
             new FieldList([$this->gridField]),
             new FieldList()
@@ -91,7 +71,7 @@ class RichFilterHeaderTest extends SapphireTest
 
         $this->assertContains(
             '<input type="text" name="filter[testfield][City]"'
-            . ' class="text grid-field__sort-field no-change-track form-group--no-label"'
+            . ' class="text grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City" />',
             $htmlFragment['header']
         );
@@ -113,14 +93,14 @@ class RichFilterHeaderTest extends SapphireTest
 
         $this->assertContains(
             '<select name="filter[testfield][Name]" '
-            . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
+            . 'class="dropdown grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_Name" placeholder="Filter by Name">',
             $htmlFragment['header']
         );
 
         $this->assertContains(
             '<select name="filter[testfield][City]" '
-            . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
+            . 'class="dropdown grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City">',
             $htmlFragment['header']
         );
@@ -153,14 +133,14 @@ class RichFilterHeaderTest extends SapphireTest
 
         $this->assertContains(
             '<select name="filter[testfield][Name]" '
-            . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
+            . 'class="dropdown grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_Name" placeholder="Filter by Name">',
             $htmlFragment['header']
         );
 
         $this->assertContains(
             '<select name="filter[testfield][City]" '
-            . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
+            . 'class="dropdown grid-field__sort-field no-change-track nolabel"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City">',
             $htmlFragment['header']
         );
@@ -170,6 +150,7 @@ class RichFilterHeaderTest extends SapphireTest
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
+        $controller = Controller::curr();
 
         /** @var $component RichFilterHeader */
         $component = $config->getComponentByType(RichFilterHeader::class);
@@ -183,7 +164,7 @@ class RichFilterHeaderTest extends SapphireTest
         $city = 'Auckland';
 
         $stateID = 'testGridStateActionField';
-        $session = Controller::curr()->getRequest()->getSession();
+        $session = $controller->getSession();
         $session->set(
             $stateID,
             [
@@ -194,7 +175,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
 
         $token = SecurityToken::inst();
-        $request = new HTTPRequest(
+        $request = new SS_HTTPRequest(
             'POST',
             'url',
             [],
@@ -209,7 +190,8 @@ class RichFilterHeaderTest extends SapphireTest
             ]
         );
 
-        $request->setSession($session);
+        $controller->setSession($session);
+        $controller->setRequest($request);
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
@@ -221,6 +203,7 @@ class RichFilterHeaderTest extends SapphireTest
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
+        $controller = Controller::curr();
 
         /** @var $component RichFilterHeader */
         $component = $config->getComponentByType(RichFilterHeader::class);
@@ -235,7 +218,7 @@ class RichFilterHeaderTest extends SapphireTest
         $keywords = 'Team 1';
 
         $stateID = 'testGridStateActionField';
-        $session = Controller::curr()->getRequest()->getSession();
+        $session = $controller->getSession();
         $session->set(
             $stateID,
             [
@@ -246,7 +229,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
 
         $token = SecurityToken::inst();
-        $request = new HTTPRequest(
+        $request = new SS_HTTPRequest(
             'POST',
             'url',
             [],
@@ -261,7 +244,8 @@ class RichFilterHeaderTest extends SapphireTest
             ]
         );
 
-        $request->setSession($session);
+        $controller->setSession($session);
+        $controller->setRequest($request);
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
@@ -272,8 +256,9 @@ class RichFilterHeaderTest extends SapphireTest
     public function testRenderFilterHeaderAdvancedFilterManyManyRelation()
     {
         $gridField = $this->gridField;
-        $gridField->setList(DataList::create(Cheerleader::class));
+        $gridField->setList(DataList::create(TestCheerleader::class));
         $config = $gridField->getConfig();
+        $controller = Controller::curr();
 
         /** @var $component RichFilterHeader */
         $component = $config->getComponentByType(RichFilterHeader::class);
@@ -285,12 +270,12 @@ class RichFilterHeaderTest extends SapphireTest
                 'Hats' => RichFilterHeader::FILTER_MANY_MANY_RELATION,
             ]);
 
-        $hat = CheerleaderHat::get()
+        $hat = TestCheerleaderHat::get()
             ->filter(['Colour' => 'Blue'])
             ->first();
 
         $stateID = 'testGridStateActionField';
-        $session = Controller::curr()->getRequest()->getSession();
+        $session = $controller->getSession();
         $session->set(
             $stateID,
             [
@@ -301,7 +286,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
 
         $token = SecurityToken::inst();
-        $request = new HTTPRequest(
+        $request = new SS_HTTPRequest(
             'POST',
             'url',
             [],
@@ -316,7 +301,8 @@ class RichFilterHeaderTest extends SapphireTest
             ]
         );
 
-        $request->setSession($session);
+        $controller->setSession($session);
+        $controller->setRequest($request);
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
@@ -328,6 +314,7 @@ class RichFilterHeaderTest extends SapphireTest
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
+        $controller = Controller::curr();
 
         /** @var $component RichFilterHeader */
         $component = $config->getComponentByType(RichFilterHeader::class);
@@ -345,7 +332,7 @@ class RichFilterHeaderTest extends SapphireTest
             ]);
 
         $stateID = 'testGridStateActionField';
-        $session = Controller::curr()->getRequest()->getSession();
+        $session = $controller->getSession();
         $session->set(
             $stateID,
             [
@@ -356,7 +343,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
 
         $token = SecurityToken::inst();
-        $request = new HTTPRequest(
+        $request = new SS_HTTPRequest(
             'POST',
             'url',
             [],
@@ -371,7 +358,8 @@ class RichFilterHeaderTest extends SapphireTest
             ]
         );
 
-        $request->setSession($session);
+        $controller->setSession($session);
+        $controller->setRequest($request);
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
 
         /** @var DataList $list */

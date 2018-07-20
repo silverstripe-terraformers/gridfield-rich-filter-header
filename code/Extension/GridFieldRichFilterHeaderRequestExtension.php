@@ -1,24 +1,12 @@
 <?php
 
-namespace Terraformers\RichFilterHeader\Extension;
-
-use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Core\Extension;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\FormRequestHandler;
-use SilverStripe\Forms\GridField\GridField;
-
 /**
  * Class GridFieldRichFilterHeaderRequestExtension
  *
  * This extension allows to process FormField actions of fields that are contained within the RichFilterHeader
  * and are identified by a composite field name
  *
- * @package Terraformers\RichFilterHeader\Extension
- *
- * @property FormRequestHandler|$this $owner
+ * @property Form|$this $owner
  */
 class GridFieldRichFilterHeaderRequestExtension extends Extension
 {
@@ -61,10 +49,10 @@ class GridFieldRichFilterHeaderRequestExtension extends Extension
     }
 
     /**
-     * @param HTTPRequest $request
+     * @param SS_HTTPRequest $request
      * @return FormField
      */
-    public function handleFieldComposite(HTTPRequest $request)
+    public function handleFieldComposite($request)
     {
         $owner = $this->owner;
 

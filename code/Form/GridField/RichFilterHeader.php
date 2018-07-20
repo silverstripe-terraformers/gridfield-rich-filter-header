@@ -1,29 +1,5 @@
 <?php
 
-namespace Terraformers\RichFilterHeader\Form\GridField;
-
-use SilverStripe\Core\ClassInfo;
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Injector\Injector;
-use SilverStripe\Forms\FieldGroup;
-use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridField_FormAction;
-use SilverStripe\Forms\GridField\GridFieldFilterHeader;
-use SilverStripe\Forms\GridField\GridState_Data;
-use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DataObjectSchema;
-use SilverStripe\ORM\Filterable;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\Filters\SearchFilter;
-use SilverStripe\ORM\SS_List;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\View\ArrayData;
-use SilverStripe\View\SSViewer;
-
 /**
  * Class RichFilterHeader
  *
@@ -142,13 +118,9 @@ use SilverStripe\View\SSViewer;
  * ])
  *
  * this is a great way to cover edge cases as the implementation of the filter is completely up to the developer
- *
- * @package Terraformers\RichFilterHeader\Form\GridField
  */
 class RichFilterHeader extends GridFieldFilterHeader
 {
-    use Configurable;
-
     // predefined filter methods
     const FILTER_ALL_KEYWORDS = 'filter_all_keywords';
     const FILTER_MANY_MANY_RELATION = 'filter_many_many_relation';
@@ -334,7 +306,7 @@ class RichFilterHeader extends GridFieldFilterHeader
         foreach ($classes as $class) {
             $manyMany = Config::inst()->get($class, 'many_many', Config::UNINHERITED);
             if (!empty($manyMany) && is_array($manyMany) && array_key_exists($relationName, $manyMany)) {
-                return DataObject::getSchema()->tableName($class);
+                return $class;
             }
         }
 
@@ -350,12 +322,12 @@ class RichFilterHeader extends GridFieldFilterHeader
     /**
      * Search for items that contain all keywords
      *
-     * @param Filterable $list
+     * @param SS_Filterable $list
      * @param string $fieldName
      * @param string $value
      * @return Filterable
      */
-    protected function applyAllKeywordsFilter(Filterable $list, $fieldName, $value)
+    protected function applyAllKeywordsFilter(SS_Filterable $list, $fieldName, $value)
     {
         $keywords = preg_split('/[\s,]+/', $value);
         foreach ($keywords as $keyword) {
@@ -375,7 +347,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      */
     protected function applyManyManyRelationFilter(DataList $list, $relationName, $value)
     {
-        $tableSeparator = DataObjectSchema::config()->uninherited('table_namespace_separator');
+        $tableSeparator = '_';
 
         $className = $list->dataClass();
         $tableName = $this->findTableNameForRelation($className, $relationName);
@@ -396,7 +368,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      */
     public static function createCompositeFieldName($gridFieldName, $childFieldName)
     {
-        $format = static::config()->get('field_name_encode');
+        $format = Config::inst()->get(static::class, 'field_name_encode');
 
         return sprintf($format, $gridFieldName, $childFieldName);
     }
@@ -407,9 +379,9 @@ class RichFilterHeader extends GridFieldFilterHeader
      */
     public static function parseCompositeFieldName($name)
     {
-        $format = static::config()->get('field_name_decode');
+        $format = Config::inst()->get(static::class, 'field_name_decode');
 
-        $matches= [];
+        $matches = [];
         preg_match($format, $name, $matches);
 
         if (isset($matches[1]) && $matches[2]) {
@@ -671,8 +643,8 @@ class RichFilterHeader extends GridFieldFilterHeader
                 if (empty($field->getAttribute('placeholder'))) {
                     $field->setAttribute(
                         'placeholder',
-                        _t('SilverStripe\\Forms\\GridField\\GridField.FilterBy', 'Filter by ')
-                        . _t('SilverStripe\\Forms\\GridField\\GridField.'.$metadata['title'], $metadata['title'])
+                        _t('GridField.FilterBy', 'Filter by ')
+                        . _t('GridField.' . $metadata['title'], $metadata['title'])
                     );
                 }
 
@@ -684,7 +656,7 @@ class RichFilterHeader extends GridFieldFilterHeader
                         )
                         ->setAttribute(
                             'title',
-                            _t('SilverStripe\\Forms\\GridField\\GridField.ResetFilter', 'Reset')
+                            _t('GridField.ResetFilter', 'Reset')
                         )
                         ->setAttribute('id', 'action_reset_' . $gridField->getModelClass() . '_' . $name)
                 );
@@ -698,7 +670,7 @@ class RichFilterHeader extends GridFieldFilterHeader
                         )
                         ->setAttribute(
                             'title',
-                            _t('SilverStripe\\Forms\\GridField\\GridField.Filter', 'Filter')
+                            _t('GridField.Filter', 'Filter')
                         )
                         ->setAttribute('id', 'action_filter_' . $gridField->getModelClass() . '_' . $name)
                 );
@@ -709,7 +681,7 @@ class RichFilterHeader extends GridFieldFilterHeader
                         )
                         ->setAttribute(
                             'title',
-                            _t('SilverStripe\\Forms\\GridField\\GridField.ResetFilter', 'Reset')
+                            _t('GridField.ResetFilter', 'Reset')
                         )
                         ->setAttribute('id', 'action_reset_' . $gridField->getModelClass() . '_' . $name)
                 );
@@ -724,7 +696,7 @@ class RichFilterHeader extends GridFieldFilterHeader
             return null;
         }
 
-        $templates = SSViewer::get_templates_by_class($this, '_Row', parent::class);
+        $templates = SSViewer::get_templates_by_class(static::class, '_Row', parent::class);
 
         return [
             'header' => $forTemplate->renderWith($templates),
