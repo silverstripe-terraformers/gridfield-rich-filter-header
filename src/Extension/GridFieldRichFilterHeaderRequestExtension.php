@@ -31,14 +31,6 @@ class GridFieldRichFilterHeaderRequestExtension extends Extension
     ];
 
     /**
-     * @config
-     * @var array
-     */
-    private static $url_handlers = [
-        'field/$FieldName!' => 'handleFieldComposite',
-    ];
-
-    /**
      * @param FieldList $fields
      * @param string $fieldName
      * @return null|FormField
