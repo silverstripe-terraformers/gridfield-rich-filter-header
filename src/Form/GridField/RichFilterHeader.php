@@ -2,7 +2,6 @@
 
 namespace Terraformers\RichFilterHeader\Form\GridField;
 
-use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injector;
@@ -13,14 +12,12 @@ use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridFieldFilterHeader;
 use SilverStripe\Forms\GridField\GridState_Data;
 use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DataObjectSchema;
 use SilverStripe\ORM\Filterable;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\Filters\SearchFilter;
 use SilverStripe\ORM\SS_List;
-use SilverStripe\ORM\ValidationException;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
 
@@ -202,6 +199,21 @@ class RichFilterHeader extends GridFieldFilterHeader
     protected $filter_methods = [];
 
     /**
+     * @param bool $useLegacy This will be removed in 5.0
+     * @param callable|null $updateSearchContext This will be removed in 5.0
+     * @param callable|null $updateSearchForm This will be removed in 5.0
+     */
+    public function __construct(
+        $useLegacy = false,
+        callable $updateSearchContext = null,
+        callable $updateSearchForm = null
+    ) {
+        // legacy option for filter header component
+        // we need to use this as new react version of this component uses a different way to scaffold search fields
+        parent::__construct(true, $updateSearchContext, $updateSearchForm);
+    }
+
+    /**
      * @param string $class
      */
     protected function setDataClass($class)
@@ -323,31 +335,6 @@ class RichFilterHeader extends GridFieldFilterHeader
     }
 
     /**
-     * @param string $className
-     * @param string $relationName
-     * @return string
-     * @throws ValidationException
-     */
-    protected function findTableNameForRelation($className, $relationName)
-    {
-        $classes = ClassInfo::ancestry($className, true);
-        foreach ($classes as $class) {
-            $manyMany = Config::inst()->get($class, 'many_many', Config::UNINHERITED);
-            if (!empty($manyMany) && is_array($manyMany) && array_key_exists($relationName, $manyMany)) {
-                return DataObject::getSchema()->tableName($class);
-            }
-        }
-
-        throw new ValidationException(
-            sprintf(
-                'Specified relation %s not found in class %s or any of its ancestors',
-                $relationName,
-                $className
-            )
-        );
-    }
-
-    /**
      * Search for items that contain all keywords
      *
      * @param Filterable $list
@@ -375,18 +362,10 @@ class RichFilterHeader extends GridFieldFilterHeader
      */
     protected function applyManyManyRelationFilter(DataList $list, $relationName, $value)
     {
-        $tableSeparator = DataObjectSchema::config()->uninherited('table_namespace_separator');
+        $columnName = null;
+        $list = $list->applyRelation($relationName . '.ID', $columnName);
 
-        $className = $list->dataClass();
-        $tableName = $this->findTableNameForRelation($className, $relationName);
-
-        $relationTable = $tableName . $tableSeparator . $relationName;
-        $relationClassName = singleton($className)->getRelationClass($relationName);
-        $relationTableName = DataObject::getSchema()->tableName($relationClassName);
-
-        return $list
-            ->innerJoin($relationTable, $tableName . '.ID=' . $relationTable . '.' . $tableName . 'ID')
-            ->filter($relationTableName . 'ID', $value);
+        return $list->where([$columnName => $value]);
     }
 
     /**
