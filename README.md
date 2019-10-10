@@ -245,3 +245,186 @@ $filter
 $label->setAttribute('placeholder', 'Filter by three different columns');
 $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 ```
+
+### Example #4
+
+* full code example on setup for `has_one` relation using a `DropdownField`
+
+This example covers
+* `Player` (has one `Team`)
+* `Team` (has many `Player`)
+* `PlayersAdmin`
+
+```
+<?php
+
+namespace App\Models;
+
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\HasManyList;
+
+/**
+ * Class Team
+ *
+ * @property string $Title
+ * @method HasManyList|Player[] Players()
+ * @package App\Models
+ */
+class Team extends DataObject
+{
+    /**
+     * @var string
+     */
+    private static $table_name = 'Team';
+
+    /**
+     * @var array
+     */
+    private static $db = [
+        'Title' => 'Varchar',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $has_many = [
+        'Players' => Player::class,
+    ];
+}
+```
+
+```
+<?php
+
+namespace App\Models;
+
+use SilverStripe\ORM\DataObject;
+
+/**
+ * Class Player
+ *
+ * @property string $Title
+ * @property int $TeamID
+ * @method Team Team()
+ * @package App\Models
+ */
+class Player extends DataObject
+{
+    /**
+     * @var string
+     */
+    private static $table_name = 'Player';
+
+    /**
+     * @var array
+     */
+    private static $db = [
+        'Title' => 'Varchar',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $has_one = [
+        'Team' => Team::class,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $summary_fields = [
+        'Title',
+        'Team.Title' => 'Team',
+    ];
+}
+```
+
+```
+<?php
+
+namespace App\Admin;
+
+use App\Models\Player;
+use App\Models\Team;
+use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldFilterHeader;
+use SilverStripe\Forms\GridField\GridFieldPaginator;
+use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
+
+/**
+ * Class PlayersAdmin
+ *
+ * @package App\Admin
+ */
+class PlayersAdmin extends ModelAdmin
+{
+    /**
+     * @var array
+     */
+    private static $managed_models = [
+        Player::class => ['title' => 'Players'],
+    ];
+
+    /**
+     * @var string
+     */
+    private static $menu_title = 'Players';
+
+    /**
+     * @var string
+     */
+    private static $url_segment = 'players';
+
+    /**
+     * @param mixed|null $id
+     * @param FieldList|null $fields
+     * @return Form
+     */
+    public function getEditForm($id = null, $fields = null): Form
+    {
+        $form = parent::getEditForm($id, $fields);
+
+        /** @var GridField $gridField */
+        $gridField = $form->Fields()->fieldByName('App-Models-Player');
+
+        if ($gridField) {
+            // Default sort order
+            $config = $gridField->getConfig();
+
+            // custom filters
+            $config->removeComponentsByType(GridFieldFilterHeader::class);
+
+            $filter = new RichFilterHeader();
+            $filter
+                ->setFilterConfig([
+                    'Title',
+                    'Team.Title' => [
+                        'title' => 'TeamID',
+                        'filter' => 'ExactMatchFilter',
+                    ],
+                ])
+                ->setFilterFields([
+                    'TeamID' => $team = DropdownField::create(
+                        '',
+                        '',
+                        Team::get()->sort('Title', 'ASC')->map('ID', 'Title')
+                    ),
+                ]);
+
+
+            $team->setEmptyString('-- select --');
+            $config->addComponent($filter, GridFieldPaginator::class);
+        }
+
+        return $form;
+    }
+}
+```
+
+We can now filter players by teams.
+
+![DropdownField](doc/example_has_one.png)

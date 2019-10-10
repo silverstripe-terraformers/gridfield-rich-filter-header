@@ -6,3 +6,10 @@ SilverStripe\Forms\FormRequestHandler:
     - Terraformers\RichFilterHeader\Extension\GridFieldRichFilterHeaderRequestExtension
   url_handlers:
     'field/$FieldName!': 'handleFieldComposite'
+
+# legacy option for filter header component
+# we need to use this as new rect version of this component uses a different way to scaffold search fields
+# this needs to be removed before SS 5 upgrade and the effort contained means checking every GridField that
+# uses this component and validating if the desired fields display works fine
+SilverStripe\Forms\GridField\GridFieldFilterHeader:
+  force_legacy: true
