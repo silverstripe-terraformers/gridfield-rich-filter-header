@@ -199,21 +199,6 @@ class RichFilterHeader extends GridFieldFilterHeader
     protected $filter_methods = [];
 
     /**
-     * @param bool $useLegacy This will be removed in 5.0
-     * @param callable|null $updateSearchContext This will be removed in 5.0
-     * @param callable|null $updateSearchForm This will be removed in 5.0
-     */
-    public function __construct(
-        $useLegacy = false,
-        callable $updateSearchContext = null,
-        callable $updateSearchForm = null
-    ) {
-        // legacy option for filter header component
-        // we need to use this as new react version of this component uses a different way to scaffold search fields
-        parent::__construct(true, $updateSearchContext, $updateSearchForm);
-    }
-
-    /**
      * @param string $class
      */
     protected function setDataClass($class)
