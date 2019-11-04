@@ -307,6 +307,7 @@ class RichFilterHeader extends GridFieldFilterHeader
             // custom field
             $field = $this->getFilterField($name);
             $field->setName($fieldName);
+            $field->setValue($value);
         } else {
             // default field
             $field = TextField::create($fieldName, '', $value);
