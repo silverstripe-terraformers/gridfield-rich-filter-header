@@ -571,7 +571,7 @@ class RichFilterHeader extends GridFieldFilterHeader
                 }
             }
         } elseif ($actionName === 'reset') {
-            $state->Columns = null;
+            $state->Columns = new GridState_Data([]);
 
             // reset all custom fields
             foreach ($this->filter_fields as $field) {
