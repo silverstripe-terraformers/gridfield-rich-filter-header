@@ -571,7 +571,11 @@ class RichFilterHeader extends GridFieldFilterHeader
                 }
             }
         } elseif ($actionName === 'reset') {
-            $state->Columns = null;
+            $state->Columns = $state->Column instanceof GridState_Data
+                // This is required since silverstripe/framework 4.8
+                ? new GridState_Data()
+                // Legacy compatibility case
+                : null;
 
             // reset all custom fields
             foreach ($this->filter_fields as $field) {
