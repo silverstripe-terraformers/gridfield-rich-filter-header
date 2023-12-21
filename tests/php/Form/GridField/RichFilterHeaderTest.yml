@@ -1,44 +1,44 @@
 Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\CheerleaderHat:
   hat1:
-    Colour: Blue
+    Colour: 'Blue'
   hat2:
-    Colour: Red
+    Colour: 'Red'
   hat3:
-    Colour: Green
+    Colour: 'Green'
   hat4:
-    Colour: Pink
+    Colour: 'Pink'
 Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Cheerleader:
   cheerleader1:
-    Name: Heather
+    Name: 'Heather'
     Hats:
       - =>Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\CheerleaderHat.hat2
   cheerleader2:
-    Name: Bob
+    Name: 'Bob'
     Hats:
       - =>Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\CheerleaderHat.hat4
   cheerleader3:
-    Name: Jenny
+    Name: 'Jenny'
     Hats:
       - =>Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\CheerleaderHat.hat1
   cheerleader4:
-    Name: Sam
+    Name: 'Sam'
     Hats:
       - =>Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\CheerleaderHat.hat3
 
 Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Team:
   team1:
-    Name: Team 1
-    City: newton
+    Name: 'Team 1'
+    City: 'newton'
     Cheerleader: =>Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Cheerleader.cheerleader3
   team2:
-    Name: Team 2
-    City: Wellington
+    Name: 'Team 2'
+    City: 'Wellington'
     Cheerleader: =>Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Cheerleader.cheerleader2
   team3:
-    Name: Team 3
-    City: Auckland
+    Name: 'Team 3'
+    City: 'Auckland'
     Cheerleader: =>Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Cheerleader.cheerleader4
   team4:
-    Name: Team 4
-    City: Melbourne
+    Name: 'Team 4'
+    City: 'Melbourne'
     Cheerleader: =>Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest\Cheerleader.cheerleader1

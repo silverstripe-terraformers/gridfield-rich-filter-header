@@ -22,8 +22,6 @@ use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
 
 /**
- * Class RichFilterHeader
- *
  * filter header with customisable filter fields and filters
  * fields that use XHR are supported
  *
@@ -139,8 +137,6 @@ use SilverStripe\View\SSViewer;
  * ])
  *
  * this is a great way to cover edge cases as the implementation of the filter is completely up to the developer
- *
- * @package Terraformers\RichFilterHeader\Form\GridField
  */
 class RichFilterHeader extends GridFieldFilterHeader
 {
@@ -598,7 +594,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param GridField $gridField
      * @return array|null
      */
-    public function getHTMLFragments($gridField)
+    public function getHTMLFragments(mixed $gridField): mixed
     {
         $list = $gridField->getList();
         if (!$this->checkDataType($list)) {

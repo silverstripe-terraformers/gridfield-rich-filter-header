@@ -6,8 +6,9 @@ use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
 
 /**
- * Class Team
- * @package Terraformers\RichFilterHeader\Tests\Form\GridField\RichFilterHeaderTest
+ * @property string $Name
+ * @property string $City
+ * @method Cheerleader Cheerleader()
  */
 class Team extends DataObject implements TestOnly
 {

@@ -19,37 +19,24 @@ use SilverStripe\Forms\GridField\GridFieldPaginator;
 use SilverStripe\ORM\DataList;
 use SilverStripe\Security\SecurityToken;
 
-/**
- * Class RichFilterHeaderTest
- * @package Terraformers\RichFilterHeader\Tests\Form\GridField
- */
 class RichFilterHeaderTest extends SapphireTest
 {
-    /**
-     * @var GridField
-     */
-    protected $gridField;
+    protected ?GridField $gridField = null;
 
-    /**
-     * @var Form
-     */
-    protected $form;
+    protected ?Form $form = null;
 
     /**
      * @var string
      */
     protected static $fixture_file = 'RichFilterHeaderTest.yml';
 
-    /**
-     * @var array
-     */
-    protected static $extra_dataobjects = array(
+    protected static $extra_dataobjects = [
         Team::class,
         Cheerleader::class,
         CheerleaderHat::class,
-    );
+    ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -68,7 +55,7 @@ class RichFilterHeaderTest extends SapphireTest
         );
     }
 
-    public function testCompositeFieldName()
+    public function testCompositeFieldName(): void
     {
         $gridFieldName = 'test-grid-field1';
         $childFieldName = 'test-child-field1';
@@ -76,11 +63,11 @@ class RichFilterHeaderTest extends SapphireTest
         $data = RichFilterHeader::parseCompositeFieldName($compositeFieldName);
 
         $this->assertNotEmpty($data);
-        $this->assertEquals($gridFieldName, $data['grid_field']);
-        $this->assertEquals($childFieldName, $data['child_field']);
+        $this->assertEquals($gridFieldName, $data['grid_field'], 'We expect a specific GridField name');
+        $this->assertEquals($childFieldName, $data['child_field'], 'We expect a specific child field name');
     }
 
-    public function testRenderFilteredHeaderStandard()
+    public function testRenderFilteredHeaderStandard(): void
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
@@ -89,15 +76,16 @@ class RichFilterHeaderTest extends SapphireTest
         $component = $config->getComponentByType(RichFilterHeader::class);
         $htmlFragment = $component->getHTMLFragments($gridField);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '<input type="text" name="filter[testfield][City]"'
             . ' class="text grid-field__sort-field no-change-track form-group--no-label"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City" />',
-            $htmlFragment['header']
+            $htmlFragment['header'],
+            'We expect a rendered filter'
         );
     }
 
-    public function testRenderFilterHeaderWithCustomFields()
+    public function testRenderFilterHeaderWithCustomFields(): void
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
@@ -111,22 +99,24 @@ class RichFilterHeaderTest extends SapphireTest
 
         $htmlFragment = $component->getHTMLFragments($gridField);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '<select name="filter[testfield][Name]" '
             . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
             . ' id="Form_mockform_filter_testfield_Name" placeholder="Filter by Name">',
-            $htmlFragment['header']
+            $htmlFragment['header'],
+            'We expect a rendered Name filter'
         );
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '<select name="filter[testfield][City]" '
             . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City">',
-            $htmlFragment['header']
+            $htmlFragment['header'],
+            'We expect a rendered City filter'
         );
     }
 
-    public function testRenderFilterHeaderWithFullConfig()
+    public function testRenderFilterHeaderWithFullConfig(): void
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
@@ -151,22 +141,24 @@ class RichFilterHeaderTest extends SapphireTest
 
         $htmlFragment = $component->getHTMLFragments($gridField);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '<select name="filter[testfield][Name]" '
             . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
             . ' id="Form_mockform_filter_testfield_Name" placeholder="Filter by Name">',
-            $htmlFragment['header']
+            $htmlFragment['header'],
+            'We expect a rendered Name filter'
         );
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '<select name="filter[testfield][City]" '
             . 'class="dropdown grid-field__sort-field no-change-track form-group--no-label"'
             . ' id="Form_mockform_filter_testfield_City" placeholder="Filter by City">',
-            $htmlFragment['header']
+            $htmlFragment['header'],
+            'We expect a rendered City filter'
         );
     }
 
-    public function testRenderFilterHeaderBasicFilter()
+    public function testRenderFilterHeaderBasicFilter(): void
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
@@ -213,11 +205,16 @@ class RichFilterHeaderTest extends SapphireTest
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
-        $this->assertEquals(1, (int) $list->count());
-        $this->assertEquals($city, $list->first()->City);
+        $this->assertSame(
+            [
+                $city,
+            ],
+            $list->column('City'),
+            'We expect a single item after filtering by City'
+        );
     }
 
-    public function testRenderFilterHeaderAdvancedFilterAllKeywords()
+    public function testRenderFilterHeaderAdvancedFilterAllKeywords(): void
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
@@ -265,11 +262,16 @@ class RichFilterHeaderTest extends SapphireTest
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
-        $this->assertEquals(1, (int) $list->count());
-        $this->assertEquals($keywords, $list->first()->Name);
+        $this->assertSame(
+            [
+                $keywords,
+            ],
+            $list->column('Name'),
+            'We expect a single item after filtering by Name'
+        );
     }
 
-    public function testRenderFilterHeaderAdvancedFilterManyManyRelation()
+    public function testRenderFilterHeaderAdvancedFilterManyManyRelation(): void
     {
         $gridField = $this->gridField;
         $gridField->setList(DataList::create(Cheerleader::class));
@@ -320,11 +322,11 @@ class RichFilterHeaderTest extends SapphireTest
         $gridField->gridFieldAlterAction(['StateID' => $stateID], $this->form, $request);
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
-        $this->assertEquals(1, (int) $list->count());
-        $this->assertEquals($hat->ID, $list->first()->Hats()->first()->ID);
+        $this->assertEquals(1, (int) $list->count(), 'We expect a single item after filtering');
+        $this->assertEquals($hat->ID, $list->first()->Hats()->first()->ID, 'We expect a specific result item');
     }
 
-    public function testRenderFilterHeaderAdvancedFilterCustomCallback()
+    public function testRenderFilterHeaderAdvancedFilterCustomCallback(): void
     {
         $gridField = $this->gridField;
         $config = $gridField->getConfig();
@@ -377,8 +379,16 @@ class RichFilterHeaderTest extends SapphireTest
         /** @var DataList $list */
         $list = $component->getManipulatedData($gridField, $gridField->getList());
 
-        $this->assertEquals(2, (int) $list->count());
-        $cities = $list->sort('City', 'ASC')->column('City');
-        $this->assertEquals(['newton', 'Wellington'], $cities);
+        $cities = $list
+            ->sort('City', 'ASC')
+            ->column('City');
+        $this->assertEquals(
+            [
+                'newton',
+                'Wellington'
+            ],
+            $cities,
+            'We expect specific results after filtering'
+        );
     }
 }
