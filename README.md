@@ -1,5 +1,11 @@
 # GridField rich filter header
 
+[![Latest Stable Version](http://poser.pugx.org/silverstripe-terraformers/gridfield-rich-filter-header/v)](https://packagist.org/packages/silverstripe-terraformers/gridfield-rich-filter-header)
+[![Total Downloads](http://poser.pugx.org/silverstripe-terraformers/gridfield-rich-filter-header/downloads)](https://packagist.org/packages/silverstripe-terraformers/gridfield-rich-filter-header)
+[![Latest Unstable Version](http://poser.pugx.org/silverstripe-terraformers/gridfield-rich-filter-header/v/unstable)](https://packagist.org/packages/silverstripe-terraformers/gridfield-rich-filter-header)
+[![License](http://poser.pugx.org/silverstripe-terraformers/gridfield-rich-filter-header/license)](https://packagist.org/packages/silverstripe-terraformers/gridfield-rich-filter-header)
+[![PHP Version Require](http://poser.pugx.org/silverstripe-terraformers/gridfield-rich-filter-header/require/php)](https://packagist.org/packages/silverstripe-terraformers/gridfield-rich-filter-header)
+
 This `GridField` component is intended to replace the default `GridFieldFilterHeader` component and provide rich functionality not available in the original.
 
 Here is a brief comparison of these components:
