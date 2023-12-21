@@ -38,13 +38,13 @@ Overall this module allows you to fully customise your `GridField` filters inclu
 
 ## Installation
 
-`composer require silverstripe-terraformers/gridfield-rich-filter-header dev-master`
+`composer require silverstripe-terraformers/gridfield-rich-filter-header`
 
 ## Basic configuration
 
 Full filter configuration format looks like this:
 
-```
+```php
 'GridField_column_name' => [
     'title' => 'DB_column_name',
     'filter' => 'search_filter_type',
@@ -53,7 +53,7 @@ Full filter configuration format looks like this:
 
 Concrete example:
 
-```
+```php
 'Expires.Nice' => [
     'title' => 'Expires',
     'filter' => 'ExactMatchFilter',
@@ -69,22 +69,26 @@ Shorter configuration formats are available as well:
 Field mapping version doesn't include filter specification and will use `PartialMatchFilter`.
 This should be used if you are happy with using `PartialMatchFilter`
 
-```
+```php
 'GridField_column_name' => 'DB_column_name',
 ```
 
 Whitelist version doesn't include filter specification nor field mapping.
 This configuration will use `PartialMatchFilter` and will assume that both `GridField_column_name` and `DB_column_name` are the same.
 
-```
+```php
 'GridField_column_name',
 ```
 
 Multiple filters configuration example:
 
-```
-$gridFieldConfig->removeComponentsByType(GridFieldFilterHeader::class);
+```php
+$gridFieldConfig->removeComponentsByType(
+    GridFieldSortableHeader::class,
+    GridFieldFilterHeader::class,
+);
 
+$sort = new RichSortableHeader();
 $filter = new RichFilterHeader();
 $filter
     ->setFilterConfig([
@@ -96,6 +100,7 @@ $filter
     ]);
 
 
+$gridFieldConfig->addComponent($sort, GridFieldPaginator::class);
 $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 ```
 
@@ -103,13 +108,14 @@ If no configuration is provided via `setFilterConfig` method, filter configurati
 If `searchable_fields` configuration is not available, `summary_fields` will be used instead.
 
 Make sure you add the `RichFilterHeader` component BEFORE the `GridFieldPaginator`
-otherwise your paginaton will be broken since you always want to filter before paginating.
+otherwise your pagination will be broken since you always want to filter before paginating.
+Sort header component also needs to be replaced to allow the filter expand button to be shown.
 
 ## Field configuration
 
 Any `FormField` can be used for filtering. You just need to add it to filter configuration like this:
 
-```
+```php
 ->setFilterFields([
     'Expires' => DateField::create('', ''),
 ])
@@ -125,7 +131,7 @@ If filter method is specified for a field, it will override the standard filter.
 Filter method is a callback which will be applied to the `DataList` and you are free to add any functionality you need
 inside the callback. Make sure that your callback returns a `DataList` with the same `DataClass` as the original.
 
-```
+```php
 ->setFilterMethods([
     'Title' => function (DataList $list, $name, $value) {
         // my custom filter logic is implemented here
@@ -143,7 +149,7 @@ For your convenience there are couple of filter methods available to cover some 
 
 Both of these filters can be used in `setFilterMethods` like this:
 
-```
+```php
 ->setFilterMethods([
     'Title' => RichFilterHeader::FILTER_ALL_KEYWORDS,
 ])
@@ -156,9 +162,13 @@ Both of these filters can be used in `setFilterMethods` like this:
 * filter with `AutoCompleteField` and filtering by `AllKeywordsFilter` filter method
 * filter with `DateField` and filtering by `StartsWithFilter`
 
-```
-$gridFieldConfig->removeComponentsByType(GridFieldFilterHeader::class);
+```php
+$gridFieldConfig->removeComponentsByType(
+    GridFieldSortableHeader::class,
+    GridFieldFilterHeader::class,
+);
 
+$sort = new RichSortableHeader();
 $filter = new RichFilterHeader();
 $filter
     ->setFilterConfig([
@@ -185,6 +195,7 @@ $dealsLookup
     ->setSourceSort('Label ASC')
     ->setRequireSelection(false);
     
+$gridFieldConfig->addComponent($sort, GridFieldPaginator::class);
 $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 ```
 
@@ -197,9 +208,13 @@ $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 
 Note that the items that are listed in the `GridField` have a `many_many` relation with `TaxonomyTerm` called `TaxonomyTerms`
 
-```
-$gridFieldConfig->removeComponentsByType(GridFieldFilterHeader::class);
+```php
+$gridFieldConfig->removeComponentsByType(
+    GridFieldSortableHeader::class,
+    GridFieldFilterHeader::class,
+);
 
+$sort = new RichSortableHeader();
 $filter = new RichFilterHeader();
 $filter
     ->setFilterConfig([
@@ -216,6 +231,7 @@ $filter
         'TaxonomyTerms' => RichFilterHeader::FILTER_MANY_MANY_RELATION,
     ]);
     
+$gridFieldConfig->addComponent($sort, GridFieldPaginator::class);
 $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 ```
 
@@ -227,9 +243,13 @@ $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 
 Our custom filter method filters records by three different `DB` columns via `PartialMatch` filter.
 
-```
-$gridFieldConfig->removeComponentsByType(GridFieldFilterHeader::class);
+```php
+$gridFieldConfig->removeComponentsByType(
+    GridFieldSortableHeader::class,
+    GridFieldFilterHeader::class,
+);
 
+$sort = new RichSortableHeader();
 $filter = new RichFilterHeader();
 $filter
     ->setFilterConfig([
@@ -249,6 +269,7 @@ $filter
     ]);
 
 $label->setAttribute('placeholder', 'Filter by three different columns');
+$gridFieldConfig->addComponent($sort, GridFieldPaginator::class);
 $gridFieldConfig->addComponent($filter, GridFieldPaginator::class);
 ```
 
@@ -261,7 +282,7 @@ This example covers
 * `Team` (has many `Player`)
 * `PlayersAdmin`
 
-```
+```php
 <?php
 
 namespace App\Models;
@@ -270,11 +291,8 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 
 /**
- * Class Team
- *
  * @property string $Title
  * @method HasManyList|Player[] Players()
- * @package App\Models
  */
 class Team extends DataObject
 {
@@ -299,7 +317,7 @@ class Team extends DataObject
 }
 ```
 
-```
+```php
 <?php
 
 namespace App\Models;
@@ -307,12 +325,9 @@ namespace App\Models;
 use SilverStripe\ORM\DataObject;
 
 /**
- * Class Player
- *
  * @property string $Title
  * @property int $TeamID
  * @method Team Team()
- * @package App\Models
  */
 class Player extends DataObject
 {
@@ -345,7 +360,7 @@ class Player extends DataObject
 }
 ```
 
-```
+```php
 <?php
 
 namespace App\Admin;
@@ -361,11 +376,6 @@ use SilverStripe\Forms\GridField\GridFieldFilterHeader;
 use SilverStripe\Forms\GridField\GridFieldPaginator;
 use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
 
-/**
- * Class PlayersAdmin
- *
- * @package App\Admin
- */
 class PlayersAdmin extends ModelAdmin
 {
     /**
@@ -402,8 +412,12 @@ class PlayersAdmin extends ModelAdmin
             $config = $gridField->getConfig();
 
             // custom filters
-            $config->removeComponentsByType(GridFieldFilterHeader::class);
-
+            $config->removeComponentsByType(
+                GridFieldSortableHeader::class,
+                GridFieldFilterHeader::class,
+            );
+            
+            $sort = new RichSortableHeader();
             $filter = new RichFilterHeader();
             $filter
                 ->setFilterConfig([
@@ -423,6 +437,7 @@ class PlayersAdmin extends ModelAdmin
 
 
             $team->setEmptyString('-- select --');
+            $config->addComponent($sort, GridFieldPaginator::class);
             $config->addComponent($filter, GridFieldPaginator::class);
         }
 

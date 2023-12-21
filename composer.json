@@ -32,6 +32,10 @@
       "dev-2": "2.x-dev"
     }
   },
+  "scripts": {
+    "lint": "phpcs src/ tests/php/",
+    "lint-clean": "phpcbf src/ tests/php/"
+  },
   "autoload": {
     "psr-4": {
       "Terraformers\\RichFilterHeader\\": "src/",
@@ -39,5 +43,12 @@
     }
   },
   "prefer-stable": true,
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "silverstripe/recipe-plugin": true,
+      "silverstripe/vendor-plugin": true
+    }
+  }
 }
