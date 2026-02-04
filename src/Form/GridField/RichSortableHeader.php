@@ -7,12 +7,11 @@ use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverStripe\Forms\GridField\GridState_Data;
 use SilverStripe\Forms\LiteralField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectSchema;
-use SilverStripe\ORM\Sortable;
-use SilverStripe\ORM\SS_List;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\List\SS_List;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\View\SSViewer;
 
 /**
@@ -45,7 +44,7 @@ class RichSortableHeader extends GridFieldSortableHeader
             return null;
         }
 
-        /** @var Sortable $list */
+        /** @var SS_List $list */
         $forTemplate = new ArrayData([]);
         $forTemplate->Fields = new ArrayList;
 

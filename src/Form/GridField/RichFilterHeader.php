@@ -12,13 +12,12 @@ use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridFieldFilterHeader;
 use SilverStripe\Forms\GridField\GridState_Data;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\Filterable;
 use SilverStripe\ORM\Filters\SearchFilter;
-use SilverStripe\ORM\SS_List;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\List\SS_List;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\View\SSViewer;
 
 /**
@@ -319,12 +318,12 @@ class RichFilterHeader extends GridFieldFilterHeader
     /**
      * Search for items that contain all keywords
      *
-     * @param Filterable $list
+     * @param SS_List $list
      * @param string $fieldName
      * @param string $value
-     * @return Filterable
+     * @return SS_List
      */
-    protected function applyAllKeywordsFilter(Filterable $list, $fieldName, $value)
+    protected function applyAllKeywordsFilter(SS_List $list, $fieldName, $value)
     {
         $keywords = preg_split('/[\s,]+/', $value);
         foreach ($keywords as $keyword) {
@@ -483,7 +482,7 @@ class RichFilterHeader extends GridFieldFilterHeader
             return $dataList;
         }
 
-        /** @var DataList|Filterable $dataList */
+        /** @var DataList|SS_List $dataList */
         $this->setDataClass($dataList->dataClass());
 
         /** @var GridState_Data $columns */
@@ -547,7 +546,7 @@ class RichFilterHeader extends GridFieldFilterHeader
             return;
         }
 
-        /** @var DataList|Filterable $list */
+        /** @var DataList|SS_List $list */
         $list = $gridField->getList();
         $this->setDataClass($list->dataClass());
 
@@ -601,7 +600,7 @@ class RichFilterHeader extends GridFieldFilterHeader
             return null;
         }
 
-        /** @var DataList|Filterable $list */
+        /** @var DataList|SS_List $list */
         $this->setDataClass($list->dataClass());
 
         $forTemplate = ArrayData::create([]);
