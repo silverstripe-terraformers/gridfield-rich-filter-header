@@ -13,29 +13,17 @@ use SilverStripe\ORM\HasManyList;
  */
 class Cheerleader extends DataObject implements TestOnly
 {
-    /**
-     * @var string
-     */
-    private static $table_name = 'GridFieldRichFilterHeaderTest_Cheerleader';
+    private static string $table_name = 'GridFieldRichFilterHeaderTest_Cheerleader';
 
-    /**
-     * @var array
-     */
-    private static $db = [
+    private static array $db = [
         'Name' => 'Varchar',
     ];
 
-    /**
-     * @var array
-     */
-    private static $has_one = [
+    private static array $has_one = [
         'Team' => Team::class,
     ];
 
-    /**
-     * @var array
-     */
-    private static $many_many = [
+    private static array $many_many = [
         'Hats' => CheerleaderHat::class,
     ];
 }

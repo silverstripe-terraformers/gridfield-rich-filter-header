@@ -88,8 +88,8 @@ $gridFieldConfig->removeComponentsByType(
     GridFieldFilterHeader::class,
 );
 
-$sort = new RichSortableHeader();
-$filter = new RichFilterHeader();
+$sort = RichSortableHeader::create();
+$filter = RichFilterHeader::create();
 $filter
     ->setFilterConfig([
         'getFancyTitle' => 'Title',
@@ -168,8 +168,8 @@ $gridFieldConfig->removeComponentsByType(
     GridFieldFilterHeader::class,
 );
 
-$sort = new RichSortableHeader();
-$filter = new RichFilterHeader();
+$sort = RichSortableHeader::create();
+$filter = RichFilterHeader::create();
 $filter
     ->setFilterConfig([
         'Label',
@@ -214,8 +214,8 @@ $gridFieldConfig->removeComponentsByType(
     GridFieldFilterHeader::class,
 );
 
-$sort = new RichSortableHeader();
-$filter = new RichFilterHeader();
+$sort = RichSortableHeader::create();
+$filter = RichFilterHeader::create();
 $filter
     ->setFilterConfig([
         'Label' => 'TaxonomyTerms',
@@ -249,8 +249,8 @@ $gridFieldConfig->removeComponentsByType(
     GridFieldFilterHeader::class,
 );
 
-$sort = new RichSortableHeader();
-$filter = new RichFilterHeader();
+$sort = RichSortableHeader::create();
+$filter = RichFilterHeader::create();
 $filter
     ->setFilterConfig([
         'Label',
@@ -296,22 +296,13 @@ use SilverStripe\ORM\HasManyList;
  */
 class Team extends DataObject
 {
-    /**
-     * @var string
-     */
-    private static $table_name = 'Team';
+    private static string $table_name = 'Team';
 
-    /**
-     * @var array
-     */
-    private static $db = [
+    private static aray $db = [
         'Title' => 'Varchar',
     ];
 
-    /**
-     * @var array
-     */
-    private static $has_many = [
+    private static array $has_many = [
         'Players' => Player::class,
     ];
 }
@@ -331,29 +322,17 @@ use SilverStripe\ORM\DataObject;
  */
 class Player extends DataObject
 {
-    /**
-     * @var string
-     */
-    private static $table_name = 'Player';
+    private static string $table_name = 'Player';
 
-    /**
-     * @var array
-     */
-    private static $db = [
+    private static array $db = [
         'Title' => 'Varchar',
     ];
 
-    /**
-     * @var array
-     */
-    private static $has_one = [
+    private static array $has_one = [
         'Team' => Team::class,
     ];
 
-    /**
-     * @var array
-     */
-    private static $summary_fields = [
+    private static array $summary_fields = [
         'Title',
         'Team.Title' => 'Team',
     ];
@@ -378,22 +357,15 @@ use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
 
 class PlayersAdmin extends ModelAdmin
 {
-    /**
-     * @var array
-     */
-    private static $managed_models = [
-        Player::class => ['title' => 'Players'],
+    private static array $managed_models = [
+        Player::class => [
+            'title' => 'Players',
+        ],
     ];
 
-    /**
-     * @var string
-     */
-    private static $menu_title = 'Players';
+    private static string $menu_title = 'Players';
 
-    /**
-     * @var string
-     */
-    private static $url_segment = 'players';
+    private static string $url_segment = 'players';
 
     /**
      * @param mixed|null $id

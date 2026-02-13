@@ -3,6 +3,6 @@ Name: gridfield-rich-filter-header
 ---
 SilverStripe\Forms\FormRequestHandler:
   extensions:
-    - Terraformers\RichFilterHeader\Extension\GridFieldRichFilterHeaderRequestExtension
+    GridFieldRichFilterHeaderRequestExtension: Terraformers\RichFilterHeader\Extension\GridFieldRichFilterHeaderRequestExtension
   url_handlers:
     'field/$FieldName!': 'handleFieldComposite'

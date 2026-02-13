@@ -2,6 +2,8 @@
 
 namespace Terraformers\RichFilterHeader\Form\GridField;
 
+use Closure;
+use Exception;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injector;
@@ -12,13 +14,12 @@ use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridFieldFilterHeader;
 use SilverStripe\Forms\GridField\GridState_Data;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\ArrayData;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\Filterable;
 use SilverStripe\ORM\Filters\SearchFilter;
-use SilverStripe\ORM\SS_List;
-use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
 
 /**
@@ -143,32 +144,21 @@ class RichFilterHeader extends GridFieldFilterHeader
     use Configurable;
 
     // predefined filter methods
-    const FILTER_ALL_KEYWORDS = 'filter_all_keywords';
-    const FILTER_MANY_MANY_RELATION = 'filter_many_many_relation';
+    public const string FILTER_ALL_KEYWORDS = 'filter_all_keywords';
+    public const string FILTER_MANY_MANY_RELATION = 'filter_many_many_relation';
 
-    /**
-     * @config
-     * @var string
-     */
-    private static $field_name_encode = 'filter[%s][%s]';
+    private static string $field_name_encode = 'filter[%s][%s]';
 
-    /**
-     * @config
-     * @var string
-     */
-    private static $field_name_decode = '/^filter\[([^]]+)\]\[([^]]+)\]$/';
+    private static string $field_name_decode = '/^filter\[([^]]+)\]\[([^]]+)\]$/';
 
-    /**
-     * @var string
-     */
-    protected $dataClass = '';
+    protected string $dataClass = '';
 
     /**
      * Filter configuration uses syntax compatible with searchable_fields and summary_fields
      *
      * @var array
      */
-    protected $filter_config = [];
+    protected array $filter_config = [];
 
     /**
      * Custom fields list - all custom fields are stored here
@@ -179,7 +169,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      *
      * @var array
      */
-    protected $filter_fields = [];
+    protected array $filter_fields = [];
 
     /**
      * Filter methods - filter callbacks can be specified per field or predefined filter methods can be chosen
@@ -192,20 +182,14 @@ class RichFilterHeader extends GridFieldFilterHeader
      *
      * @var array
      */
-    protected $filter_methods = [];
+    protected array $filter_methods = [];
 
-    /**
-     * @param string $class
-     */
-    protected function setDataClass($class)
+    protected function setDataClass(string $class): void
     {
         $this->dataClass = $class;
     }
 
-    /**
-     * @return array
-     */
-    protected function getFilterConfig()
+    protected function getFilterConfig(): array
     {
         // primary config
         if (!empty($this->filter_config)) {
@@ -237,7 +221,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param string|array $config
      * @return array
      */
-    protected function parseFieldConfig($name, $config)
+    protected function parseFieldConfig(string $name, mixed $config): array
     {
         $data = [];
         if (is_array($config)) {
@@ -253,11 +237,7 @@ class RichFilterHeader extends GridFieldFilterHeader
         return $data;
     }
 
-    /**
-     * @param string $name
-     * @return array
-     */
-    protected function findFieldConfig($name)
+    protected function findFieldConfig(string $name): array
     {
         $fields = $this->getFilterConfig();
 
@@ -281,22 +261,12 @@ class RichFilterHeader extends GridFieldFilterHeader
         return [];
     }
 
-    /**
-     * @param string $field
-     * @return bool
-     */
-    protected function hasFilterMethod($field)
+    protected function hasFilterMethod(string $field): bool
     {
         return array_key_exists($field, $this->filter_methods);
     }
 
-    /**
-     * @param GridField $gridField
-     * @param string $name
-     * @param string $value
-     * @return FormField
-     */
-    protected function createField(GridField $gridField, $name, $value)
+    protected function createField(GridField $gridField, string $name, string $value): FormField
     {
         $fieldName = static::createCompositeFieldName($gridField->getName(), $name);
         if ($this->hasFilterField($name)) {
@@ -319,16 +289,18 @@ class RichFilterHeader extends GridFieldFilterHeader
     /**
      * Search for items that contain all keywords
      *
-     * @param Filterable $list
+     * @param SS_List $list
      * @param string $fieldName
      * @param string $value
-     * @return Filterable
+     * @return SS_List
      */
-    protected function applyAllKeywordsFilter(Filterable $list, $fieldName, $value)
+    protected function applyAllKeywordsFilter(SS_List $list, string $fieldName, string $value): SS_List
     {
         $keywords = preg_split('/[\s,]+/', $value);
         foreach ($keywords as $keyword) {
-            $list = $list->filter(["{$fieldName}:PartialMatch" => $keyword]);
+            $list = $list->filter([
+                sprintf('%s:PartialMatch', $fieldName) => $keyword,
+            ]);
         }
 
         return $list;
@@ -342,7 +314,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param string $value
      * @return DataList
      */
-    protected function applyManyManyRelationFilter(DataList $list, $relationName, $value)
+    protected function applyManyManyRelationFilter(DataList $list, string $relationName, string $value): DataList
     {
         $columnName = null;
         $list = $list->applyRelation($relationName . '.ID', $columnName);
@@ -350,23 +322,14 @@ class RichFilterHeader extends GridFieldFilterHeader
         return $list->where([$columnName => $value]);
     }
 
-    /**
-     * @param string $gridFieldName
-     * @param string $childFieldName
-     * @return string
-     */
-    public static function createCompositeFieldName($gridFieldName, $childFieldName)
+    public static function createCompositeFieldName(string $gridFieldName, string $childFieldName): string
     {
         $format = static::config()->get('field_name_encode');
 
         return sprintf($format, $gridFieldName, $childFieldName);
     }
 
-    /**
-     * @param string $name
-     * @return array
-     */
-    public static function parseCompositeFieldName($name)
+    public static function parseCompositeFieldName(string $name): array
     {
         $format = static::config()->get('field_name_decode');
 
@@ -392,7 +355,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param array $fields
      * @return $this
      */
-    public function setFilterConfig(array $fields)
+    public function setFilterConfig(array $fields): RichFilterHeader
     {
         $this->filter_config = $fields;
 
@@ -407,7 +370,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param array $fields
      * @return $this
      */
-    public function setFilterFields(array $fields)
+    public function setFilterFields(array $fields): RichFilterHeader
     {
         $this->filter_fields = $fields;
 
@@ -422,18 +385,14 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param array $fields
      * @return $this
      */
-    public function setFilterMethods(array $fields)
+    public function setFilterMethods(array $fields): RichFilterHeader
     {
         $this->filter_methods = $fields;
 
         return $this;
     }
 
-    /**
-     * @param string $field
-     * @return FormField|null
-     */
-    public function getFilterField($field)
+    public function getFilterField(string $field): ?FormField
     {
         if ($this->hasFilterField($field)) {
             return $this->filter_fields[$field];
@@ -448,7 +407,7 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param GridField $gridField
      * @return boolean
      */
-    public function canFilterAnyColumns($gridField)
+    public function canFilterAnyColumns(mixed $gridField): bool
     {
         $list = $gridField->getList();
 
@@ -476,14 +435,15 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param GridField $gridField
      * @param SS_List $dataList
      * @return SS_List
+     * @throws Exception
      */
-    public function getManipulatedData(GridField $gridField, SS_List $dataList)
+    public function getManipulatedData(GridField $gridField, SS_List $dataList): SS_List
     {
         if (!$this->checkDataType($dataList)) {
             return $dataList;
         }
 
-        /** @var DataList|Filterable $dataList */
+        /** @var DataList|SS_List $dataList */
         $this->setDataClass($dataList->dataClass());
 
         /** @var GridState_Data $columns */
@@ -509,7 +469,7 @@ class RichFilterHeader extends GridFieldFilterHeader
                     // filter method configuration is available
                     $filter = $this->filter_methods[$name];
 
-                    if ($filter instanceof \Closure) {
+                    if ($filter instanceof Closure) {
                         // custom filter method
                         $dataListClone = $filter($dataListClone, $name, $value);
                     } elseif ($filter === static::FILTER_ALL_KEYWORDS) {
@@ -541,13 +501,13 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param mixed $arguments
      * @param mixed $data
      */
-    public function handleAction(GridField $gridField, $actionName, $arguments, $data)
+    public function handleAction(GridField $gridField, mixed $actionName, mixed $arguments, mixed $data): void
     {
         if (!$this->checkDataType($gridField->getList())) {
             return;
         }
 
-        /** @var DataList|Filterable $list */
+        /** @var DataList|SS_List $list */
         $list = $gridField->getList();
         $this->setDataClass($list->dataClass());
 
@@ -581,11 +541,7 @@ class RichFilterHeader extends GridFieldFilterHeader
         }
     }
 
-    /**
-     * @param string $field
-     * @return bool
-     */
-    protected function hasFilterField($field)
+    protected function hasFilterField(string $field): bool
     {
         return array_key_exists($field, $this->filter_fields);
     }
@@ -594,14 +550,14 @@ class RichFilterHeader extends GridFieldFilterHeader
      * @param GridField $gridField
      * @return array|null
      */
-    public function getHTMLFragments(mixed $gridField): mixed
+    public function getHTMLFragments(mixed $gridField): ?array
     {
         $list = $gridField->getList();
         if (!$this->checkDataType($list)) {
             return null;
         }
 
-        /** @var DataList|Filterable $list */
+        /** @var DataList|SS_List $list */
         $this->setDataClass($list->dataClass());
 
         $forTemplate = ArrayData::create([]);
@@ -616,7 +572,7 @@ class RichFilterHeader extends GridFieldFilterHeader
             $currentColumn++;
             $metadata = $gridField->getColumnMetadata($name);
             $title = $metadata['title'];
-            $fields = new FieldGroup();
+            $fields = FieldGroup::create();
 
             $fieldConfig = $this->findFieldConfig($name);
             $name = (!empty($fieldConfig['title'])) ? $fieldConfig['title'] : $name;
@@ -634,11 +590,8 @@ class RichFilterHeader extends GridFieldFilterHeader
 
                 // add placeholder attribute only if it's not provided already
                 if (empty($field->getAttribute('placeholder'))) {
-                    $field->setAttribute(
-                        'placeholder',
-                        _t('SilverStripe\\Forms\\GridField\\GridField.FilterBy', 'Filter by ')
-                        . _t('SilverStripe\\Forms\\GridField\\GridField.'.$metadata['title'], $metadata['title'])
-                    );
+                    $filterByLabel = _t('SilverStripe\\Forms\\GridField\\GridField.FilterBy', 'Filter by ');
+                    $field->setAttribute('placeholder', $filterByLabel. $metadata['title']);
                 }
 
                 $fields->push($field);
@@ -659,7 +612,8 @@ class RichFilterHeader extends GridFieldFilterHeader
                 $fields->push(
                     GridField_FormAction::create($gridField, 'filter', false, 'filter', null)
                         ->addExtraClass(
-                            'btn font-icon-search btn--no-text btn--icon-large grid-field__filter-submit ss-gridfield-button-filter'
+                            'btn font-icon-search btn--no-text btn--icon-large '
+                            . 'grid-field__filter-submit ss-gridfield-button-filter'
                         )
                         ->setAttribute(
                             'title',
@@ -670,7 +624,8 @@ class RichFilterHeader extends GridFieldFilterHeader
                 $fields->push(
                     GridField_FormAction::create($gridField, 'reset', false, 'reset', null)
                         ->addExtraClass(
-                            'btn font-icon-cancel btn--no-text grid-field__filter-clear btn--icon-md ss-gridfield-button-close'
+                            'btn font-icon-cancel btn--no-text '
+                            . 'grid-field__filter-clear btn--icon-md ss-gridfield-button-close'
                         )
                         ->setAttribute(
                             'title',

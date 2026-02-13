@@ -30,6 +30,9 @@ class RichFilterHeaderTest extends SapphireTest
      */
     protected static $fixture_file = 'RichFilterHeaderTest.yml';
 
+    /**
+     * @var array
+     */
     protected static $extra_dataobjects = [
         Team::class,
         Cheerleader::class,

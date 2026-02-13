@@ -2,40 +2,32 @@
 
 namespace Terraformers\RichFilterHeader\Extension;
 
-use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\FormRequestHandler;
 use SilverStripe\Forms\GridField\GridField;
+use Terraformers\RichFilterHeader\Form\GridField\RichFilterHeader;
 
 /**
- * Class GridFieldRichFilterHeaderRequestExtension
- *
  * This extension allows to process FormField actions of fields that are contained within the RichFilterHeader
  * and are identified by a composite field name
  *
- * @package Terraformers\RichFilterHeader\Extension
- *
- * @property FormRequestHandler|$this $owner
+ * @extends Extension<FormRequestHandler>
  */
 class GridFieldRichFilterHeaderRequestExtension extends Extension
 {
-    /**
-     * @config
-     * @var array
-     */
-    private static $allowed_actions = [
+    private static array $allowed_actions = [
         'handleFieldComposite',
     ];
 
     /**
      * @param FieldList $fields
      * @param string $fieldName
-     * @return null|FormField
+     * @return FormField|null
      */
-    protected function findField(FieldList $fields, $fieldName)
+    protected function findField(FieldList $fields, string $fieldName): ?FormField
     {
         // try to find the field by name first
         $field = $fields->dataFieldByName($fieldName);
@@ -54,11 +46,11 @@ class GridFieldRichFilterHeaderRequestExtension extends Extension
 
     /**
      * @param HTTPRequest $request
-     * @return FormField
+     * @return FormField|null
      */
-    public function handleFieldComposite(HTTPRequest $request)
+    public function handleFieldComposite(HTTPRequest $request): ?FormField
     {
-        $owner = $this->owner;
+        $owner = $this->getOwner();
 
         // perform standard field lookup
         $field = $owner->handleField($request);
