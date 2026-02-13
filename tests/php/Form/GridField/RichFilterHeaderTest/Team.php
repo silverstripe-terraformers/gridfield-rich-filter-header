@@ -12,31 +12,19 @@ use SilverStripe\ORM\DataObject;
  */
 class Team extends DataObject implements TestOnly
 {
-    /**
-     * @var string
-     */
-    private static $table_name = 'GridFieldRichFilterHeaderTest_Team';
+    private static string $table_name = 'GridFieldRichFilterHeaderTest_Team';
 
-    /**
-     * @var array
-     */
-    private static $summary_fields = [
+    private static array $summary_fields = [
         'Name' => 'Name',
         'City.Initial' => 'City',
     ];
 
-    /**
-     * @var array
-     */
-    private static $db = [
+    private static array $db = [
         'Name' => 'Varchar',
         'City' => 'Varchar',
     ];
 
-    /**
-     * @var array
-     */
-    private static $has_one = [
+    private static array $has_one = [
         'Cheerleader' => Cheerleader::class,
     ];
 }

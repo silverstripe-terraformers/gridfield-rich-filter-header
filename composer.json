@@ -1,9 +1,12 @@
 {
   "name": "silverstripe-terraformers/gridfield-rich-filter-header",
-  "description": "Rich filter header component from GridField",
+  "description": "Rich filter header component for GridField",
   "type": "silverstripe-vendormodule",
   "keywords": [
-    "silverstripe", "gridfield", "filter", "header"
+    "silverstripe",
+    "gridfield",
+    "filter",
+    "header"
   ],
   "license": "BSD-3-Clause",
   "authors": [
@@ -19,15 +22,22 @@
     "issues": "https://github.com/silverstripe-terraformers/gridfield-rich-filter-header/issues"
   },
   "require": {
-    "php": "^8.1",
-    "silverstripe/framework": "^5"
+    "php": "^8.3",
+    "silverstripe/framework": "^6",
+    "silverstripe/cms": "^6",
+    "silverstripe/admin": "^3"
   },
   "require-dev": {
-    "silverstripe/recipe-testing": "^3"
+    "silverstripe/documentation-lint": "^1",
+    "silverstripe/recipe-testing": "^4",
+    "silverstripe/frameworktest": "^2",
+    "silverstripe/standards": "^1",
+    "phpstan/extension-installer": "^1.3"
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "3.x-dev",
+      "dev-master": "4.x-dev",
+      "dev-3": "3.x-dev",
       "dev-2": "2.x-dev"
     }
   },
@@ -47,7 +57,8 @@
     "allow-plugins": {
       "composer/installers": true,
       "silverstripe/recipe-plugin": true,
-      "silverstripe/vendor-plugin": true
+      "silverstripe/vendor-plugin": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
   }
 }

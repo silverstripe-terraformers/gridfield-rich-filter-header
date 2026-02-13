@@ -12,22 +12,13 @@ use SilverStripe\ORM\ManyManyList;
  */
 class CheerleaderHat extends DataObject implements TestOnly
 {
-    /**
-     * @var string
-     */
-    private static $table_name = 'GridFieldRichFilterHeaderTest_CheerleaderHat';
+    private static string $table_name = 'GridFieldRichFilterHeaderTest_CheerleaderHat';
 
-    /**
-     * @var array
-     */
-    private static $db = [
+    private static array $db = [
         'Colour' => 'Varchar',
     ];
 
-    /**
-     * @var array
-     */
-    private static $belongs_many_many = [
+    private static array $belongs_many_many = [
         'Cheerleaders' => Cheerleader::class,
     ];
 }

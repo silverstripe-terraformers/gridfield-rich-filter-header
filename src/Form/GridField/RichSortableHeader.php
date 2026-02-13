@@ -7,12 +7,11 @@ use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
 use SilverStripe\Forms\GridField\GridState_Data;
 use SilverStripe\Forms\LiteralField;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\ArrayData;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectSchema;
-use SilverStripe\ORM\Sortable;
-use SilverStripe\ORM\SS_List;
-use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
 
 /**
@@ -24,9 +23,9 @@ class RichSortableHeader extends GridFieldSortableHeader
      * Code of this method is copied from the parent method except of the <INSERT_FILTER_BUTTON> section
      *
      * @param mixed $gridField
-     * @return mixed
+     * @return array|null
      */
-    public function getHTMLFragments(mixed $gridField): mixed
+    public function getHTMLFragments(mixed $gridField): ?array
     {
         /** @var RichFilterHeader $filter */
         $filter = $gridField
@@ -39,15 +38,15 @@ class RichSortableHeader extends GridFieldSortableHeader
             return parent::getHTMLFragments($gridField);
         }
 
+        /** @var SS_List $list */
         $list = $gridField->getList();
 
         if (!$this->checkDataType($list)) {
             return null;
         }
 
-        /** @var Sortable $list */
-        $forTemplate = new ArrayData([]);
-        $forTemplate->Fields = new ArrayList;
+        $forTemplate = ArrayData::create([]);
+        $forTemplate->Fields = ArrayList::create();
 
         $state = $this->getState($gridField);
         $columns = $gridField->getColumns();
@@ -120,10 +119,12 @@ class RichSortableHeader extends GridFieldSortableHeader
                 }
             } else {
                 // start <INSERT_FILTER_BUTTON>
-                $sortActionFieldContents = $currentColumn == count($columns ?? []) && $filter->canFilterAnyColumns($gridField)
+                $columnsCount = count($columns ?? []);
+                $sortActionFieldContents = $currentColumn == $columnsCount && $filter->canFilterAnyColumns($gridField)
                     ? sprintf(
                         '<button type="button" name="showFilter" aria-label="%1$s" title="%1$s"' .
-                        ' class="btn btn-secondary font-icon-search btn--no-text btn--icon-large grid-field__filter-open"></button>',
+                        ' class="btn btn-secondary font-icon-search btn--no-text '
+                        . 'btn--icon-large grid-field__filter-open"></button>',
                         _t('SilverStripe\\Forms\\GridField\\GridField.OpenFilter', "Open search and filter")
                     )
                     : '<span class="non-sortable">' . $title . '</span>';
